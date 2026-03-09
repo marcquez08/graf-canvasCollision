@@ -13,6 +13,7 @@ class Circle {
         this.posY = y;
         this.radius = radius;
         this.color = color;
+        this.originalColor = color; // guardar color original
         this.text = text;
         this.speed = speed;
         this.dx = 1 * this.speed;
@@ -55,7 +56,7 @@ function generateCircles(n) {
         let x = Math.random() * (window_width - radius * 2) + radius;
         let y = Math.random() * (window_height - radius * 2) + radius;
         let color = `#${Math.floor(Math.random()*16777215).toString(16)}`; // Color aleatorio
-        let speed = Math.random() * 2 + 1; // Velocidad entre 1 y 3
+        let speed = Math.random() * 4 + 1; // Velocidad entre 1 y 5
         let text = `C${i + 1}`; // Etiqueta del círculo
         circles.push(new Circle(x, y, radius, color, text, speed));
     }
@@ -68,6 +69,52 @@ function animate() {
     });
     requestAnimationFrame(animate); // Repetir la animación
 }
+
+function detectCollisions(){
+
+    // Primero regresar todos al color original
+    for(let i = 0; i < circles.length; i++){
+        circles[i].color = circles[i].originalColor;
+    }
+
+    // Después detectar colisiones
+    for(let i = 0; i < circles.length; i++){
+
+        for(let j = i + 1; j < circles.length; j++){
+
+            let c1 = circles[i];
+            let c2 = circles[j];
+
+            let dx = c1.posX - c2.posX;
+            let dy = c1.posY - c2.posY;
+
+            let distance = Math.sqrt(dx * dx + dy * dy);
+
+            if(distance < c1.radius + c2.radius){
+
+                c1.color = "#0000FF";
+                c2.color = "#0000FF";
+
+            }
+        }
+    }
+
+}
+
+function animate() {
+
+    ctx.clearRect(0, 0, window_width, window_height);
+
+    detectCollisions();
+
+    circles.forEach(circle => {
+        circle.update(ctx);
+    });
+
+    requestAnimationFrame(animate);
+
+}
+
 // Generar N círculos y comenzar la animación
-generateCircles(5); // Puedes cambiar el número de círculos aquí
+generateCircles(20); // Puedes cambiar el número de círculos aquí
 animate();
